@@ -1,0 +1,21 @@
+---
+- name: Update nameserver entry on ipareplcas and ipaclients
+  hosts: ipareplicas,ipaclients
+  become: true
+  roles:
+  - role: rhel-system-roles.network
+## Must have the ansible-freeipa rpm package installed.
+- name: Installs the IdM server
+  import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-server.yml
+## By default PTR records are not created. If DNS is handled by a 3rd party application you can comment out the below step.
+- name: Turn IdM DNS PTR Sync on
+  hosts: ipaserver
+  gather_facts: false
+  become: false
+  roles:
+  - role: idm-dnsconfig
+    state: present
+- name: Installs the IdM replicas
+  import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-replica.yml
+- name: Installs the IdM clients
+  import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-client.yml
