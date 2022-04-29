@@ -1,6 +1,6 @@
 ---
 - name: Update nameserver entry on ipareplcas and ipaclients
-  hosts: ipareplicas,ipaclients
+  hosts: ipareplicas:ipaclients
   become: true
   roles:
   - role: rhel-system-roles.network
@@ -14,7 +14,6 @@
   become: false
   roles:
   - role: idm-dnsconfig
-    state: present
 - name: Installs the IdM replicas
   import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-replica.yml
 - name: Installs the IdM clients
