@@ -1,0 +1,5 @@
+---
+# tasks file for ad-agents
+- name: Add trust agent to replicas
+  ansible.builtin.command: "/sbin/ipa-adtrust-install --add-agents --unattended"
+

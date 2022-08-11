@@ -1,20 +1,58 @@
 ---
+- name: Configure Windows
+  hosts: win
+  become_method: runas
+  become_user: Administrator
+  become: False
+  roles:
+    - role: winCreate
+      state: present
+    - role: winUsers
+      state: present
+    - role: winDelegate
+      state: present
+  tags: win
+# Register systems to RH CDN or on-premise Satellite
+- name: Subscribe systems to RH CDN
+  hosts: all
+  become: True
+  roles:
+  - role: subscribe-cdn
+  tags: cdn
+- name: Subscribe systems to on-premise Satellite
+  hosts: all:!win
+  become: True
+  roles:
+  - role: subscribe-sat
+  tags: satloc
+# Points ipareplicas and ipaclients to ipaserver to find SRV records
 - name: Update nameserver entry on ipareplcas and ipaclients
-  hosts: ipareplicas:ipaclients
+  hosts: all:!ipaserver:!win:!others
   become: true
   roles:
   - role: rhel-system-roles.network
+# Enables crypto support for AD ciphers
+- name: Update Crypto policy for AD Trust
+  hosts: ipaserver:ipareplicas
+  become: true
+  roles:
+  - role: rhel-system-roles.crypto_policies
+    vars:
+      crypto_policies_policy: "DEFAULT:AD-SUPPORT"
+      crypto_policies_reboot_required: True
 ## Must have the ansible-freeipa rpm package installed.
 - name: Installs the IdM server
   import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-server.yml
-## By default PTR records are not created. If DNS is handled by a 3rd party application you can comment out the below step.
 - name: Turn IdM DNS PTR Sync on
   hosts: ipaserver
   gather_facts: false
   become: false
   roles:
   - role: idm-dnsconfig
+    state: present
 - name: Installs the IdM replicas
   import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-replica.yml
+  tags: replica
 - name: Installs the IdM clients
   import_playbook: /usr/share/doc/ansible-freeipa/playbooks/install-client.yml
+  tags: clients

@@ -1,0 +1,48 @@
+---
+# tasks file for winUsers
+- name: Create AD Trust user
+  community.windows.win_domain_user:
+    name: delegate
+    firstname: DNS
+    surname: Delegation
+    password: "{{ admin_password }}"
+    state: present
+    groups:
+      - Enterprise Admins
+    domain_username: '{{ ad_netbios }}\Administrator'
+    domain_password: "{{ admin_password }}"
+# Create AD IdM users
+- name: Create AD Group for IdM Integration
+  ansible.windows.win_group:
+    name: "{{ ad_grp_users }}"
+    state: present
+- name: AD Users for IdM Integration
+  community.windows.win_domain_user:
+    name: "{{ item.ad_name }}"
+    firstname: "{{ item.ad_first }}"
+    surname: "{{ item.ad_last }}"
+    password: "{{ ad_idm_password }}"
+    state: present
+    groups:
+      - "{{ ad_grp_users }}"
+    domain_username: '{{ ad_netbios }}\Administrator'
+    domain_password: "{{ admin_password }}"
+  with_items: "{{ ad_idm_users }}"
+# Create AD IdM admins
+- name: Create AD Group for IdM Integration
+  ansible.windows.win_group:
+    name: "{{ ad_grp_admins }}"
+    state: present
+- name: Create Enterprise Admin User
+  community.windows.win_domain_user:
+    name: "{{ item.ad_name }}"
+    firstname: "{{ item.ad_first }}"
+    surname: "{{ item.ad_last }}"
+    password: "{{ admin_password }}"
+    state: present
+    groups:
+      - Enterprise Admins
+      - "{{ ad_grp_admins }}"
+    domain_username: '{{ ad_netbios }}\Administrator'
+    domain_password: "{{ admin_password }}"
+  with_items: "{{ ad_idm_admins }}"
