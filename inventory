@@ -18,7 +18,7 @@ all:
           ipaserver_allow_zone_overlap: yes
           ipaserver_no_forwarders: yes
           ipaserver_no_dnssec_validation: yes
-          ipaserver_netbios_name: "{{ idm_short | upper }}"
+          ipaserver_netbios_name: "{{ shortname | upper }}"
           ipaserver_firewalld_zone: public
     ipareplicas:
       hosts: 
@@ -56,25 +56,16 @@ all:
               address: "{{ ansible_default_ipv4.address }}/24"
               gateway4: "{{ ansible_default_ipv4.gateway }}"   
   vars:
-## IPA Info
-    domain: "{{ idm_short }}.{{ ad_domain }}"
+## Global
+    admin_password: '' # Admin password used for all applications
+    domain: "{{ shortname }}.{{ root_domain }}"
+    root_domain: 'example.com' # AD domain, usually the root of your IdM
+    shortname: "web"
+## IdM Info
     ipaadmin_password: "{{ admin_password }}"
     ipadm_password: "{{ admin_password }}"
-## IdM User Creation
-    idm_users: # IPA Admins
-      - { idm_name: dauston, idm_first: Duncan, idm_last: Auston, id: 10001 }
-      - { idm_name: anadine, idm_first: Angie, idm_last: Nadine, id: 10002 }
-      - { idm_name: sbronte, idm_first: Sammy, idm_last: Bronte, id: 10003 }
-    user_password: 'Redhat123!' # test user password
-    idm_admins: # IdM admins name
-      - { idm_name: johnd_idm, idm_first: John, idm_last: Doe }
-      - { idm_name: janed_idm, idm_first: Jane, idm_last: Doe }
-## IdM Configuration
-    idm_short: "web"
-    host_group: "ipaclients"
 ## AD Info
     ad_password: "{{ admin_password }}" # AD administrator password
-    ad_domain: 'example.com' # AD domain, usually the root of your IdM
     ad_ip: '192.168.1.5' # AD IP
     ad_netbios: "EXAMPLE"
     idm_pri: "idm.{{ domain }}"
@@ -101,5 +92,3 @@ all:
     satKey9: '' # Activation key for RHEL 9 servers
     satCDN_user: '' # customer portal account username if using the CDN to register and update the servers
     satCDN_passwd: '' # customer portal account pasword if using the CDN to register and update the servers
-## Global Info
-    admin_password: '' # Admin password used for all applications

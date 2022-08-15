@@ -2,7 +2,7 @@
 # tasks file for winDelegate
 - name: Delegate IdM Zone to IdM Primary
   ansible.windows.win_powershell:
-    script: Add-DnsServerZoneDelegation -Name "{{ ad_domain }}" -ChildZoneName "{{ idm_short }}" -NameServer "{{ idm_pri }}" -IPAddress {{ idm_DNS1 }}
+    script: Add-DnsServerZoneDelegation -Name "{{ root_domain }}" -ChildZoneName "{{ shortname }}" -NameServer "{{ idm_pri }}" -IPAddress {{ idm_DNS1 }}
 - name: Delegate IdM Zone to IdM Replica
   ansible.windows.win_powershell:
-    script: Add-DnsServerZoneDelegation -Name "{{ ad_domain }}" -ChildZoneName "{{ idm_short }}" -NameServer "{{ idm_rep }}" -IPAddress {{ idm_DNS2 }}
+    script: Add-DnsServerZoneDelegation -Name "{{ root_domain }}" -ChildZoneName "{{ shortname }}" -NameServer "{{ idm_rep }}" -IPAddress {{ idm_DNS2 }}

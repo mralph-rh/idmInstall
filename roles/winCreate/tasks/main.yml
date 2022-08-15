@@ -2,9 +2,9 @@
 # tasks file for winCreate
 - name: Promote to DC
   ansible.windows.win_domain:
-    dns_domain_name: "{{ ad_domain }}"
+    dns_domain_name: "{{ root_domain }}"
     domain_netbios_name: "{{ ad_netbios }}"
-    domain_admin_user: Administrator@{{ ad_domain }}
+    domain_admin_user: Administrator@{{ root_domain }}
     domain_admin_password: "{{ admin_password }}"
     safe_mode_password: "{{ admin_password }}"
     create_dns_delegation: no
@@ -13,7 +13,7 @@
   ansible.windows.win_reboot:
 - name: Delegate IdM Zone to IdM Primary
   ansible.windows.win_powershell:
-    script: Add-DnsServerZoneDelegation -Name "{{ ad_domain }}" -ChildZoneName "{{ idm_short }}" -NameServer "{{ idm_pri }}" -IPAddress {{ idm_DNS1 }}
+    script: Add-DnsServerZoneDelegation -Name "{{ root_domain }}" -ChildZoneName "{{ shortname }}" -NameServer "{{ idm_pri }}" -IPAddress {{ idm_DNS1 }}
 - name: Delegate IdM Zone to IdM Replica
   ansible.windows.win_powershell:
-    script: Add-DnsServerZoneDelegation -Name "{{ ad_domain }}" -ChildZoneName "{{ idm_short }}" -NameServer "{{ idm_rep }}" -IPAddress {{ idm_DNS2 }}
+    script: Add-DnsServerZoneDelegation -Name "{{ root_domain }}" -ChildZoneName "{{ shortname }}" -NameServer "{{ idm_rep }}" -IPAddress {{ idm_DNS2 }}
